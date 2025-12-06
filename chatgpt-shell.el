@@ -79,6 +79,7 @@
 
 (require 'chatgpt-shell-anthropic)
 (require 'chatgpt-shell-deepseek)
+(require 'chatgpt-shell-zhipu)
 (require 'chatgpt-shell-google)
 (require 'chatgpt-shell-kagi)
 (require 'chatgpt-shell-ollama)
@@ -249,6 +250,7 @@ This function aggregates models from OpenAI, Anthropic, Google, and Ollama.
 It returns a list containing all available models from these providers."
   (append (chatgpt-shell-anthropic-models)
           (chatgpt-shell-deepseek-models)
+          (chatgpt-shell-zhipu-models)
           (chatgpt-shell-google-models)
           (chatgpt-shell-kagi-models)
           (chatgpt-shell-ollama-models)
