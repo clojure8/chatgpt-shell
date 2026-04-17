@@ -45,22 +45,42 @@ VALIDATE-COMMAND and OTHER-PARAMS for `chatgpt-shell-openai-make-model'."
    :filter #'chatgpt-shell-zhipu--filter-output
    :icon "openai.png"))
 
+(defcustom chatgpt-shell-zhipu-models
+  (list '(:version "glm-5.1"
+          :short-version "glm-5.1"
+          :label "GLM"
+          :token-width 16
+          :context-window 131072)
+        '(:version "glm-4.5-air"
+          :short-version "glm-4.5-air"
+          :label "GLM"
+          :token-width 16
+          :context-window 131072))
+  "List of Zhipu (GLM) model configurations.
+
+Each entry is a property list with keys:
+  :version - Model version string (e.g. \"glm-4.6\")
+  :short-version - Short version string
+  :label - Display label (e.g. \"GLM\")
+  :token-width - Token width (integer)
+  :context-window - Context window size in tokens (integer)
+
+See https://open.bigmodel.cn for available models."
+  :type '(repeat (plist :key-type symbol :value-type sexp))
+  :group 'chatgpt-shell)
+
+(defun chatgpt-shell-zhipu--make-model-from-plist (plist)
+  "Create a Zhipu model from a property list PLIST."
+  (apply #'chatgpt-shell-zhipu-make-model
+         :version (plist-get plist :version)
+         :short-version (plist-get plist :short-version)
+         :label (plist-get plist :label)
+         :token-width (plist-get plist :token-width)
+         :context-window (plist-get plist :context-window)))
+
 (defun chatgpt-shell-zhipu-models ()
-  "Build a list of Zhipu LLM models."
-  (list (chatgpt-shell-zhipu-make-model
-         :version "glm-4.6"
-         :short-version "glm-4.6"
-         :label "GLM"
-         :token-width 16
-         ;; See https://open.bigmodel.cn
-         :context-window 131072)
-        (chatgpt-shell-zhipu-make-model
-         :version "glm-4.5-air"
-         :short-version "glm-4.5-air"
-         :label "GLM"
-         :token-width 16
-         ;; See https://open.bigmodel.cn
-         :context-window 131072)))
+  "Build a list of Zhipu LLM models from `chatgpt-shell-zhipu-models'."
+  (mapcar #'chatgpt-shell-zhipu--make-model-from-plist chatgpt-shell-zhipu-models))
 
 (defcustom chatgpt-shell-zhipu-api-url-base "https://open.bigmodel.cn/api/coding/paas/v4"
   "Zhipu API's base URL.
@@ -75,7 +95,7 @@ If you use Zhipu through a proxy service, change the URL base."
 (defcustom chatgpt-shell-zhipu-key nil
   "Zhipu API key as a string or a function that loads and returns it."
   :type '(choice (function :tag "Function")
-                 (string :tag "String"))
+          (string :tag "String"))
   :group 'chatgpt-shell)
 
 (defun chatgpt-shell-zhipu-key ()
